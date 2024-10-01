@@ -41,7 +41,7 @@ app.post('/create-image', async (req, res) => {
     res.send(imageGPT.data[0].url)
 })
 
-app.get('/', (req,res) => {
+app.get('/test', (req,res) => {
     res.send('hello')
 })
 const PORT = 8000
