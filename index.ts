@@ -44,7 +44,7 @@ app.post('/create-image', async (req, res) => {
 app.get('/test', (req,res) => {
     res.send('hello')
 })
-const PORT = 8000
+const PORT = 443
 app.listen(PORT, () => {
     console.log('backend running port ',PORT)
 
