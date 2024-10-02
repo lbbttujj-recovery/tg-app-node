@@ -28,6 +28,20 @@ bot.on('message',  (ctx) => {
 
 console.log('app running')
 
+app.use(cors({
+    origin: 'https://main--lbbttujj2.netlify.app/', // Укажите ваш фронтенд-домен
+    methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
+}));
+
+// Обработка "preflight" запросов
+app.options('*', cors()); // Для всех маршрутов
+
+// Пример маршрута
+app.get('/api/data', (req, res) => {
+    res.json({ message: 'CORS и HTTPS работают!' });
+});
+
 
 app.post('/create-image', async (req, res) => {
     const {mood} = req.body
