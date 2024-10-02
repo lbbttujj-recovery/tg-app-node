@@ -2,6 +2,7 @@ import TelegramBot from "node-telegram-bot-api";
 import express from 'express'
 import {OpenAI} from 'openai'
 import cors from 'cors'
+import * as https from "https";
 
 const bot = new TelegramBot('',{polling: true})
 
@@ -45,7 +46,21 @@ app.get('/test', (req,res) => {
     res.send('hello')
 })
 const PORT = 443
-app.listen(PORT, () => {
-    console.log('backend running port ',PORT)
+// app.listen(PORT, () => {
+//     console.log('backend running port ',PORT)
+//
+// })
 
+const httpsOptions = {
+    cert: '',
+    ca: '',
+    key: '',
+}
+
+const httpsServer = https.createServer(httpsOptions, (req,res) => {
+    res.statusCode = 200
+    res.setHeader('Content-Type','text/html')
+    res.end('<h2>hi</h2>')
 })
+
+httpsServer.listen(PORT)
