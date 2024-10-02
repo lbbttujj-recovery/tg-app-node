@@ -3,6 +3,7 @@ import express from 'express'
 import {OpenAI} from 'openai'
 import cors from 'cors'
 import * as https from "https";
+import * as fs from "fs";
 
 const bot = new TelegramBot('',{polling: true})
 
@@ -52,9 +53,9 @@ const PORT = 443
 // })
 
 const httpsOptions = {
-    cert: '',
-    ca: '',
-    key: '',
+    cert: fs.readFileSync('./certs/certificate.crt'),
+    ca: fs.readFileSync('./certs/certificate_ca.crt'),
+    key: fs.readFileSync('./certs/certificate.key'),
 }
 
 const httpsServer = https.createServer(httpsOptions, (req,res) => {
