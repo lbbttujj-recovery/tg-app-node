@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node index.ts"
+    "start": "cross-env NODE_ENV=production pm2 start index.ts",
+    "dev": "cross-env NODE_ENV=development ts-node index.ts"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +20,7 @@
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "@typescript-eslint/parser": "^7.4.0",
     "babel-eslint": "^10.1.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
@@ -31,9 +33,11 @@
   "dependencies": {
     "@notionhq/client": "^2.2.14",
     "axios": "^1.6.8",
+    "bun": "^1.1.30",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "node-telegram-bot-api": "^0.66.0",
-    "openai": "^4.38.2"
+    "openai": "^4.38.2",
+    "pm2": "^5.4.2"
   }
 }
