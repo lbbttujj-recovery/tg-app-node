@@ -171,10 +171,15 @@ app.get('/getSum', (req,res) => {
             return;
         }
 
+        console.log('pre ff')
+
         const command = ffmpeg();
         audioFiles.forEach(file => {
             command.input(file);
         });
+
+        console.log('after ff')
+
         command
             .on('error', (err) => {
                 console.error('Error: ' + err.message);
