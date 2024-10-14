@@ -96,7 +96,7 @@ bot.on('text',  (ctx) => {
 console.log('app running')
 
 app.use(cors({
-    origin: `${IS_PROD ? 'https://main--lbbttujj2.netlify.app/' : '*' } `,
+    origin: '*',
     methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'],
     allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
 }));
