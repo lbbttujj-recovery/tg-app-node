@@ -60,6 +60,43 @@ bot.on('voice', async (ctx) => {
         })
 })
 
+bot.onText(new RegExp('^decode$','ig'), async (ctx) => {
+    const outputFile = './result/result.mp3';
+
+    fs.readdir('./voices', (err, files) => {
+        if (err) {
+            console.error('Error reading directory: ' + err.message);
+            return;
+        }
+
+        // Фильтруем файлы, чтобы взять только аудиофайлы, например, mp3
+        const audioFiles = files
+            .filter(file => path.extname(file).toLowerCase() === '.mp3') // фильтр по расширению .mp3
+            .map(file => path.join('./voices', file)); // полный путь к каждому файлу
+
+        if (audioFiles.length === 0) {
+            console.log('No audio files found in the directory.');
+            return;
+        }
+
+        const command = ffmpeg();
+        audioFiles.forEach(file => {
+            command.input(file);
+        });
+        command
+            .on('error', (err) => {
+                console.error('Error: ' + err.message);
+            })
+            .on('end', () => {
+                bot.sendMessage(ctx.chat.id, 'Соединил');
+                const voice = fs.readFileSync('./result/result.mp3')
+                bot.sendVoice(ctx.chat.id, voice)
+
+            })
+            .mergeToFile(outputFile, './output');
+    })
+})
+
 
 bot.onText(new RegExp('^trans$','ig'), async (ctx) => {
     const {text: trans} = await ai.audio.transcriptions.create({
@@ -152,6 +189,29 @@ app.get('/getVoices/name', (req,res) => {
     })
 })
 
+
+app.get('/speechToText', async (req,res) => {
+    const {text: trans} = await ai.audio.transcriptions.create({
+        file: fs.createReadStream('./result/result.mp3'),
+        model: 'whisper-1',
+    })
+    res.send(trans)
+    fs.writeFile('./result/result.txt', trans, (err) => {
+        if (err) throw err;
+        console.log('File has been created and content has been written.');
+    });
+})
+
+
+app.get('/brief', async (req,res) => {
+    const trans = fs.readFileSync('./result/result.txt', 'utf-8')
+    const summary = await ai.chat.completions.create({
+        messages: [{ role: 'user', content: `Мне друг отправил сообщения, расскажи что он хотел мне сказать: ${trans}` }],
+        model: 'gpt-3.5-turbo',
+    })
+    res.send(summary.choices[0].message.content || '')
+})
+
 app.get('/getSum', (req,res) => {
     const outputFile = './result/result.mp3';
 
@@ -171,14 +231,11 @@ app.get('/getSum', (req,res) => {
             return;
         }
 
-        console.log('pre ff')
 
         const command = ffmpeg();
         audioFiles.forEach(file => {
             command.input(file);
         });
-
-        console.log('after ff')
 
         command
             .on('error', (err) => {
