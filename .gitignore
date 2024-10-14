@@ -1,2 +1,5 @@
 /.env
-certs
+/certs
+/certs2
+/node_modules
+.idea
