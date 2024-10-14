@@ -39,6 +39,9 @@ bot.on('voice', async (ctx) => {
         url,
         responseType: 'stream',
     })
+        if (!fs.existsSync('./voices')) {
+            fs.mkdirSync('./voices', { recursive: true });
+        }
         const stream = fs.createWriteStream(oggPath)
         response.data.pipe(stream)
         stream.on('finish', async () => {
@@ -57,52 +60,6 @@ bot.on('voice', async (ctx) => {
         })
 })
 
-bot.onText(new RegExp('^delete$', 'ig'), async (ctx) => {
-    await bot.sendMessage(ctx.chat.id,'Удалил')
-    const directoryVoice = path.resolve(__dirname, './voices')
-    const directoryResult = path.resolve(__dirname, './result')
-    fs.rmSync(directoryVoice, { recursive: true, force: true })
-    fs.mkdirSync(directoryVoice)
-    fs.rmSync(directoryResult, { recursive: true, force: true })
-    fs.mkdirSync(directoryResult)
-})
-
-bot.onText(new RegExp('^decode$','ig'), async (ctx) => {
-    const outputFile = './result/result.mp3';
-
-    fs.readdir('./voices', (err, files) => {
-        if (err) {
-            console.error('Error reading directory: ' + err.message);
-            return;
-        }
-
-        // Фильтруем файлы, чтобы взять только аудиофайлы, например, mp3
-        const audioFiles = files
-            .filter(file => path.extname(file).toLowerCase() === '.mp3') // фильтр по расширению .mp3
-            .map(file => path.join('./voices', file)); // полный путь к каждому файлу
-
-        if (audioFiles.length === 0) {
-            console.log('No audio files found in the directory.');
-            return;
-        }
-
-        const command = ffmpeg();
-        audioFiles.forEach(file => {
-            command.input(file);
-        });
-        command
-            .on('error', (err) => {
-                console.error('Error: ' + err.message);
-            })
-            .on('end', () => {
-                bot.sendMessage(ctx.chat.id, 'Соединил');
-                const voice = fs.readFileSync('./result/result.mp3')
-                bot.sendVoice(ctx.chat.id, voice)
-
-            })
-            .mergeToFile(outputFile, './output');
-    })
-})
 
 bot.onText(new RegExp('^trans$','ig'), async (ctx) => {
     const {text: trans} = await ai.audio.transcriptions.create({
@@ -160,7 +117,7 @@ app.post('/create-image', async (req, res) => {
         res.send('https://steamuserimages-a.akamaihd.net/ugc/5103172932219996638/4FE828816AAF7B0660DD1BD7C94EBD54C68EF692/?imw=512&amp;&amp;ima=fit&amp;impolicy=Letterbox&amp;imcolor=%23000000&amp;letterbox=false')
     } else {
         const imageGPT = await ai.images.generate(
-            {model: 'dall-e-3', prompt: `Сгенериуй эмоцию: ${mood}`, size: '1024x1024', quality: 'standard', n: 1}
+            {model: 'dall-e-2', prompt: `Сгенериуй эмоцию в виде котика: ${mood}`, size: '1024x1024', quality: 'standard', n: 1}
         )
         res.send(imageGPT.data[0].url)
     }
@@ -168,6 +125,70 @@ app.post('/create-image', async (req, res) => {
 
 app.get('/test', (req,res) => {
     res.send('hello')
+})
+
+app.get('/getVoices', (req,res) => {
+    const voicesName = fs.readdirSync('./voices')
+    res.send(voicesName)
+})
+
+app.post('/delete', (req,res) => {
+    const directoryVoice = path.resolve(__dirname, './voices')
+    const directoryResult = path.resolve(__dirname, './result')
+    fs.rmSync(directoryVoice, { recursive: true, force: true })
+    fs.mkdirSync(directoryVoice)
+    fs.rmSync(directoryResult, { recursive: true, force: true })
+    fs.mkdirSync(directoryResult)
+})
+
+const audioFilePath = (name: string) => path.join(__dirname, 'voices', name); // Измените на путь к вашему аудиофайлу
+
+app.get('/getVoices/name', (req,res) => {
+    const audioFileName = String(req.headers.name);
+    res.sendFile(audioFilePath(audioFileName), (err) => {
+        if(err){
+            console.error('не получилось по имени', err)
+        }
+    })
+})
+
+app.get('/getSum', (req,res) => {
+    const outputFile = './result/result.mp3';
+
+    fs.readdir('./voices', (err, files) => {
+        if (err) {
+            console.error('Error reading directory: ' + err.message);
+            return;
+        }
+
+        // Фильтруем файлы, чтобы взять только аудиофайлы, например, mp3
+        const audioFiles = files
+            .filter(file => path.extname(file).toLowerCase() === '.mp3') // фильтр по расширению .mp3
+            .map(file => path.join('./voices', file)); // полный путь к каждому файлу
+
+        if (audioFiles.length === 0) {
+            console.log('No audio files found in the directory.');
+            return;
+        }
+
+        const command = ffmpeg();
+        audioFiles.forEach(file => {
+            command.input(file);
+        });
+        command
+            .on('error', (err) => {
+                console.error('Error: ' + err.message);
+            })
+            .on('end', () => {
+                res.sendFile(path.resolve(__dirname, 'result/result.mp3'), (err) => {
+                    if(err) {
+                        console.error('не получилось целиком', err)
+                    }
+                })
+
+            })
+            .mergeToFile(outputFile, './output');
+    })
 })
 
 if(!IS_PROD) {
