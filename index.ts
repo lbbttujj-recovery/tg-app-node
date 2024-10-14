@@ -129,7 +129,7 @@ bot.on('text',  (ctx) => {
     bot.sendMessage(ctx.chat.id, 'Приложение', {
         reply_markup: {
             inline_keyboard: [
-                [{text: 'Настроение', web_app: {url: `${FRONT_URL}`}}],
+                [{text: 'Настроение', web_app: {url: `${FRONT_URL}/mood`}}],
                 [{text: 'Голосове', web_app: {url: `${FRONT_URL}/voice`}}]
             ],
         }
