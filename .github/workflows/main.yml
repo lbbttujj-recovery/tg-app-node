@@ -16,9 +16,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@194.135.105.154 << 'EOF'
             cd tg-app-node/
-            pm2 stop index.ts
             git fetch
             git pull origin main
             npm ci
-            pm2 start index.ts
+            pm2 restart index.ts
           EOF
