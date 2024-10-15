@@ -8,10 +8,14 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SECRET_RSA_DEPLOY }}
       - name: Deploy
         run: |
           ssh -o StrictHostKeyChecking=no root@194.135.105.154 << 'EOF'
-            ${{ secrets.DEPLOY_SECRET }}
+            cd tg-app-node/
             pm2 stop index.ts
             git fetch
             git pull origin main
