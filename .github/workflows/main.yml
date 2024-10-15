@@ -6,3 +6,7 @@ jobs:
     steps:
       - name: Print to console
         run: echo Hello Actions
+      - name: Print two
+        run: |
+          echo First line
+          echo Secondl iine
