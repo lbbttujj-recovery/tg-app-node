@@ -17,7 +17,7 @@ export const voiceApiTg = (bot: TelegramBot, ai: OpenAI) => {
       url,
       responseType: 'stream',
     })
-    if (!fs.existsSync(path.resolve(__dirname, './voices')) {
+    if (!fs.existsSync(path.resolve(__dirname, './voices'))) {
       fs.mkdirSync(path.resolve(__dirname, './voices'), { recursive: true })
     }
     const stream = fs.createWriteStream(oggPath)
