@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Deploy
         run: |
-          ssh root@194.135.105.154
+          ssh -tt root@194.135.105.154
           ${{ secrets.DEPLOY_SECRET }}
           pm2 stop index.ts
           git fetch
