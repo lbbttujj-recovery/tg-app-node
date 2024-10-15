@@ -8,13 +8,13 @@ jobs:
   deploy:
     runs-on: ubuntu-22.04
     steps:
-      - name: Deploy
-        run: |
-          ssh -o StrictHostKeyChecking=no root@194.135.105.154 << 'EOF'
-          ${{ secrets.DEPLOY_SECRET }}
-          pm2 stop index.ts
-          git fetch
-          git pull origin main
-          npm ci
-          pm2 start index.ts  
-         EOF
+    - name: Deploy
+      run: |
+        ssh -o StrictHostKeyChecking=no root@194.135.105.154 << 'EOF'
+        ${{ secrets.DEPLOY_SECRET }}
+        pm2 stop index.ts
+        git fetch
+        git pull origin main
+        npm ci
+        pm2 start index.ts  
+       EOF
