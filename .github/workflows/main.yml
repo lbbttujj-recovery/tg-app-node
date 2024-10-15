@@ -19,5 +19,5 @@ jobs:
             git fetch
             git pull origin main
             npm ci
-            pm2 restart index.ts
+            npm run restart
           EOF
