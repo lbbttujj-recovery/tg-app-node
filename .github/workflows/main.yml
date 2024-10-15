@@ -11,10 +11,10 @@ jobs:
       - name: Deploy
         run: |
           ssh -o StrictHostKeyChecking=no root@194.135.105.154 << 'EOF'
-          ${{ secrets.DEPLOY_SECRET }}
-          pm2 stop index.ts
-          git fetch
-          git pull origin main
-          npm ci
-          pm2 start index.ts  
-         EOF
+            ${{ secrets.DEPLOY_SECRET }}
+            pm2 stop index.ts
+            git fetch
+            git pull origin main
+            npm ci
+            pm2 start index.ts
+          EOF
