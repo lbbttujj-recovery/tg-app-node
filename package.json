@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env NODE_ENV=production ts-node index.ts",
+    "start": "cross-env NODE_ENV=production pm2 start index.ts",
     "dev": "cross-env NODE_ENV=development nodemon index.ts"
   },
   "keywords": [],

@@ -1,12 +1,20 @@
-name: Demo Workflow
-on: workflow_dispatch
+name: Deploy
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 jobs:
-  print:
+  deploy:
     runs-on: ubuntu-22.04
     steps:
-      - name: Print to console
-        run: echo Hello Actions
-      - name: Print two
+      - name: Deploy
         run: |
-          echo First line
-          echo Secondl iine
+          ssh root@194.135.105.154
+          ${{ secrets.DEPLOY_SECRET }}
+          pm2 stop index.ts
+          git fetch
+          git pull origin main
+          pm2 start index.ts
+          echo Success
+          

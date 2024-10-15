@@ -169,7 +169,7 @@ app.get('/getVoices', (req,res) => {
     res.send(voicesName)
 })
 
-app.post('/delete', (req,res) => {
+app.delete('/delete', (req,res) => {
     const directoryVoice = path.resolve(__dirname, './voices')
     const directoryResult = path.resolve(__dirname, './result')
     fs.rmSync(directoryVoice, { recursive: true, force: true })
