@@ -9,9 +9,10 @@ export const voiceApiTg = (bot: TelegramBot, ai: OpenAI) => {
   bot.on('voice', async (ctx) => {
     await bot.sendMessage(ctx.chat.id, 'Получил голосовое!')
     const id = ctx.voice?.file_id || ''
+    const msgData = ctx.forward_date || ctx.date
     const url = await bot.getFileLink(id)
-    const oggPath = path.resolve(__dirname, './voices', `${id}.oga`)
-    const mp3Path = path.resolve(__dirname, './voices', `${id}.mp3`)
+    const oggPath = path.resolve(__dirname, './voices', `${msgData}.oga`)
+    const mp3Path = path.resolve(__dirname, './voices', `${msgData}.mp3`)
     const response = await axios({
       method: 'get',
       url,

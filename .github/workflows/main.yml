@@ -24,6 +24,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@194.135.105.154 << 'EOF'
             cd tg-app-node/
+            pkill node
             git fetch
             git pull origin main
             git checkout origin/main

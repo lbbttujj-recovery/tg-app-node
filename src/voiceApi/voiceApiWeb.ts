@@ -14,15 +14,6 @@ export const voiceApiWeb = (ai: OpenAI) => {
     res.send(voicesName)
   })
 
-  router.delete('/delete', (req, res) => {
-    const directoryVoice = path.resolve(__dirname, './voices')
-    const directoryResult = path.resolve(__dirname, './result')
-    fs.rmSync(directoryVoice, { recursive: true, force: true })
-    fs.mkdirSync(directoryVoice)
-    fs.rmSync(directoryResult, { recursive: true, force: true })
-    fs.mkdirSync(directoryResult)
-  })
-
   router.get('/getVoices/name', (req, res) => {
     const audioFileName = String(req.headers.name)
     res.sendFile(audioFilePath(audioFileName), (err) => {
@@ -32,13 +23,32 @@ export const voiceApiWeb = (ai: OpenAI) => {
     })
   })
 
+  router.delete('/delete', (req, res) => {
+    console.log('delete')
+    try {
+      const directoryVoice = path.resolve(__dirname, './voices')
+      const directoryResult = path.resolve(__dirname, './result')
+      fs.rmSync(directoryVoice, { recursive: true, force: true })
+      fs.mkdirSync(directoryVoice)
+      fs.rmSync(directoryResult, { recursive: true, force: true })
+      fs.mkdirSync(directoryResult)
+    } catch (e) {
+      res.status(500).send(e)
+    }
+    res.send('success')
+  })
+
   router.get('/speechToText', async (req, res) => {
     const { text: trans } = await ai.audio.transcriptions.create({
       file: fs.createReadStream(path.resolve(__dirname, './result/result.mp3')),
       model: 'whisper-1',
     })
     res.send(trans)
-    fs.writeFile(path.resolve(__dirname, './result/result.txt'), trans, (err) => {
+    setTimeout(() => {
+      res.send('Перевод')
+    }, 1000)
+
+    fs.writeFile(path.resolve(__dirname, './result/result.txt'), 'Перевод', (err) => {
       if (err) throw err
       console.log('File has been created and content has been written.')
     })
@@ -51,10 +61,12 @@ export const voiceApiWeb = (ai: OpenAI) => {
       model: 'gpt-3.5-turbo',
     })
     res.send(summary.choices[0].message.content || '')
+    res.send('Пересказ')
   })
 
   router.get('/getSum', (req, res) => {
     const outputFile = path.resolve(__dirname, './result/result.mp3')
+    console.log('sum')
 
     if (!fs.existsSync(path.resolve(path.resolve(__dirname, './result')))) {
       fs.mkdirSync(path.resolve(path.resolve(__dirname, './result')), { recursive: true })
@@ -63,6 +75,7 @@ export const voiceApiWeb = (ai: OpenAI) => {
     fs.readdir(path.resolve(__dirname, './voices'), (err, files) => {
       if (err) {
         console.error('Error reading directory: ' + err.message)
+        res.status(500)
         return
       }
 
@@ -84,6 +97,7 @@ export const voiceApiWeb = (ai: OpenAI) => {
       command
         .on('error', (err) => {
           console.error('Error: ' + err.message)
+          res.status(500).send(err.message)
         })
         .on('end', () => {
           res.sendFile(path.resolve(__dirname, 'result/result.mp3'), (err) => {
