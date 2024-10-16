@@ -39,7 +39,7 @@ export const voiceApiTg = (bot: TelegramBot, ai: OpenAI) => {
   })
 
   bot.onText(new RegExp('^decode$', 'ig'), async (ctx) => {
-    const outputFile = './result/result.mp3'
+    const outputFile = path.resolve(__dirname, './result/result.mp3')
 
     fs.readdir(path.resolve(__dirname, './voices'), (err, files) => {
       if (err) {
@@ -50,7 +50,7 @@ export const voiceApiTg = (bot: TelegramBot, ai: OpenAI) => {
       // Фильтруем файлы, чтобы взять только аудиофайлы, например, mp3
       const audioFiles = files
         .filter((file) => path.extname(file).toLowerCase() === '.mp3') // фильтр по расширению .mp3
-        .map((file) => path.join('./voices', file)) // полный путь к каждому файлу
+        .map((file) => path.join(path.resolve(__dirname, './voices'), file)) // полный путь к каждому файлу
 
       if (audioFiles.length === 0) {
         console.log('No audio files found in the directory.')
@@ -67,20 +67,20 @@ export const voiceApiTg = (bot: TelegramBot, ai: OpenAI) => {
         })
         .on('end', () => {
           bot.sendMessage(ctx.chat.id, 'Соединил')
-          const voice = fs.readFileSync('./result/result.mp3')
+          const voice = fs.readFileSync(path.resolve(__dirname, './result/result.mp3'))
           bot.sendVoice(ctx.chat.id, voice)
         })
-        .mergeToFile(outputFile, './output')
+        .mergeToFile(outputFile, path.resolve(__dirname, './output'))
     })
   })
 
   bot.onText(new RegExp('^trans$', 'ig'), async (ctx) => {
     const { text: trans } = await ai.audio.transcriptions.create({
-      file: fs.createReadStream('./result/result.mp3'),
+      file: fs.createReadStream(path.resolve(__dirname, './result/result.mp3')),
       model: 'whisper-1',
     })
     await bot.sendMessage(ctx.chat.id, trans)
-    fs.writeFile('./result/result.txt', trans, (err) => {
+    fs.writeFile(path.resolve(__dirname, './result/result.txt'), trans, (err) => {
       if (err) throw err
       console.log('File has been created and content has been written.')
     })
@@ -97,7 +97,7 @@ export const voiceApiTg = (bot: TelegramBot, ai: OpenAI) => {
   })
 
   bot.onText(new RegExp('^brief$', 'ig'), async (ctx) => {
-    const trans = fs.readFileSync('./result/result.txt', 'utf-8')
+    const trans = fs.readFileSync(path.resolve(__dirname, './result/result.txt'), 'utf-8')
     const summary = await ai.chat.completions.create({
       messages: [
         {
