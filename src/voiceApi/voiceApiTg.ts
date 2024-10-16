@@ -5,9 +5,32 @@ import TelegramBot from 'node-telegram-bot-api'
 import { OpenAI } from 'openai'
 import axios from 'axios'
 
+// function debounce<T extends (...args: any[]) => void>(
+//     func: T,
+//     delay: number,
+//     immediate: boolean = false
+// ): (...args: Parameters<T>) => void {
+//   let timeoutId: ReturnType<typeof setTimeout> | null;
+//
+//   return function(this: any, ...args: Parameters<T>) {
+//     const context = this;
+//     const callNow = immediate && !timeoutId;
+//
+//     if (timeoutId) {
+//       clearTimeout(timeoutId);
+//     }
+//
+//     timeoutId = setTimeout(() => {
+//       timeoutId = null;
+//       if (!immediate) func.apply(context, args);
+//     }, delay);
+//
+//     if (callNow) func.apply(context, args);
+//   };
+// }
+
 export const voiceApiTg = (bot: TelegramBot, ai: OpenAI) => {
   bot.on('voice', async (ctx) => {
-    await bot.sendMessage(ctx.chat.id, 'Получил голосовое!')
     const id = ctx.voice?.file_id || ''
     const msgData = ctx.forward_date || ctx.date
     const url = await bot.getFileLink(id)
@@ -30,6 +53,7 @@ export const voiceApiTg = (bot: TelegramBot, ai: OpenAI) => {
         .toFormat('mp3')
         .on('error', (error) => console.log(`Encoding Error: ${error.message}`))
         .on('end', () => {
+          // debounce(() => bot.sendMessage(ctx.chat.id, 'Сохранил'), 100)
           bot.sendMessage(ctx.chat.id, 'Сохранил')
           fs.rmSync(oggPath, {
             force: true,
