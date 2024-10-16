@@ -19,5 +19,5 @@ jobs:
             git fetch
             git pull origin main
             npm ci
-            npm run restart
+            npm run tsnode
           EOF
