@@ -12,10 +12,14 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SECRET_RSA_DEPLOY }}
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4.0.4
+      - name: NVM Setup Node
+        uses: irby/setup-node-nvm@master
         with:
-           node-version: 20.x
+          node-version: lts/*
+      - name: Check
+        run: |
+          node -v
+          npm -v
       - name: Deploy
         run: |
           ssh -o StrictHostKeyChecking=no root@194.135.105.154 << 'EOF'
