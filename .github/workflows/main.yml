@@ -12,6 +12,10 @@ jobs:
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SECRET_RSA_DEPLOY }}
+      - name: Install Node js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
       - name: Deploy
         run: |
           ssh -o StrictHostKeyChecking=no root@194.135.105.154 << 'EOF'
