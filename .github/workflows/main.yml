@@ -16,10 +16,10 @@ jobs:
       #   uses: irby/setup-node-nvm@master
       #   with:
       #     node-version: lts/*
-      - name: Check
-        run: |
-          node -v
-          npm -v
+      # - name: Check
+      #   run: |
+      #     node -v
+      #     npm -v
       - name: Deploy
         run: |
           ssh -o StrictHostKeyChecking=no root@194.135.105.154 << 'EOF'
@@ -27,7 +27,12 @@ jobs:
             git fetch
             git pull origin main
             git checkout origin/main
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+            source ~/.bashrc
+            nvm install node
+            nvm install-latest-npm
             node -v
+            nvm --version
             npm ci
             npm run tsnode
           EOF
