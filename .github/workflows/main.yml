@@ -40,3 +40,4 @@ jobs:
             npm ci
             npm run tsnode
           EOF
+          exit 0

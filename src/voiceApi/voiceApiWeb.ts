@@ -4,6 +4,10 @@ import ffmpeg from 'fluent-ffmpeg'
 import { Router } from 'express'
 import { OpenAI } from 'openai'
 
+const mockText = {
+  short: 'Перевел, распознал, все сделал',
+  long: `Каждый новый день — это шаг в неизведанную вселенную возможностей. Ветер перемен шепчет нам о том, что границы реальности гибки, и всё зависит от нашего взгляда на мир. Солнце пробивается сквозь облака, и вместе с его лучами в нас вселяется сила. Сила не останавливаться, сила творить, изменять, воплощать самые смелые идеи в реальность.Мы — частицы этой огромной мозаики, где каждый элемент важен. И в этом постоянном движении мира, каждый наш шаг, каждый вдох — это новый мазок на полотне жизни. Каждый новый день — это шаг в неизведанную вселенную возможностей. Ветер перемен шепчет нам о том, что границы реальности гибки, и всё зависит от нашего взгляда на мир. Солнце пробивается сквозь облака, и вместе с его лучами в нас вселяется сила. Сила не о Каждый новый день — это шаг в неизведанную вселенную возможностей. Ветер перемен шепчет нам о том, что границы реальности гибки, и всё зависит от нашего взгляда на мир. Солнце пробивается сквозь облака, и вместе с его лучами в нас вселяется сила. Сила не о`,
+}
 export const voiceApiWeb = (ai: OpenAI, isProd: boolean) => {
   const router = Router()
 
@@ -44,13 +48,13 @@ export const voiceApiWeb = (ai: OpenAI, isProd: boolean) => {
         file: fs.createReadStream(path.resolve(__dirname, './result/result.mp3')),
         model: 'whisper-1',
       })
-      // if (isProd) {
-      res.send(trans)
-      // } else {
-      // setTimeout(() => {
-      //   res.send('Перевод')
-      // }, 1000)
-      // }
+      if (isProd) {
+        res.send(trans)
+      } else {
+        setTimeout(() => {
+          res.send(mockText.long)
+        }, 500)
+      }
 
       fs.writeFile(path.resolve(__dirname, './result/result.txt'), trans, (err) => {
         if (err) throw err
@@ -63,18 +67,17 @@ export const voiceApiWeb = (ai: OpenAI, isProd: boolean) => {
 
   router.get('/brief', async (req, res) => {
     const trans = fs.readFileSync(path.resolve(__dirname, './result/result.txt'), 'utf-8')
-    // if (!isProd) {
-    //   setTimeout(() => {
-    //     res.send('Пересказ')
-    //   }, 1000)
-    // } else {
-    console.log(trans)
-    const summary = await ai.chat.completions.create({
-      messages: [{ role: 'user', content: `Мне друг отправил сообщения, расскажи что он хотел мне сказать: ${trans}` }],
-      model: 'gpt-3.5-turbo',
-    })
-    res.send(summary.choices[0].message.content || '')
-    // }
+    if (!isProd) {
+      setTimeout(() => {
+        res.send(mockText.short)
+      }, 500)
+    } else {
+      const summary = await ai.chat.completions.create({
+        messages: [{ role: 'user', content: `Мне друг отправил сообщения, расскажи что он хотел мне сказать: ${trans}` }],
+        model: 'gpt-3.5-turbo',
+      })
+      res.send(summary.choices[0].message.content || '')
+    }
   })
 
   router.get('/getSum', (req, res) => {
