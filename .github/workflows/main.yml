@@ -39,6 +39,8 @@ jobs:
             node -v
             nvm --version
             npm ci
-            nohup npm run tsnode &
-            exit
+            npm run tsnode &
+            npm -v
+            exit 0
           EOF
+          exit 0
