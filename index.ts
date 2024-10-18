@@ -44,7 +44,7 @@ bot.on('text', (ctx) => {
 })
 
 voiceApiTg(bot, ai)
-const routesVoice = voiceApiWeb(ai)
+const routesVoice = voiceApiWeb(ai, IS_PROD)
 const routesMood = moodApi(ai, IS_PROD)
 
 // Подключаем маршруты

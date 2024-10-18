@@ -4,7 +4,7 @@ import ffmpeg from 'fluent-ffmpeg'
 import { Router } from 'express'
 import { OpenAI } from 'openai'
 
-export const voiceApiWeb = (ai: OpenAI) => {
+export const voiceApiWeb = (ai: OpenAI, isProd: boolean) => {
   const router = Router()
 
   const audioFilePath = (name: string) => path.join(__dirname, 'voices', name) // Измените на путь к вашему аудиофайлу
@@ -39,29 +39,41 @@ export const voiceApiWeb = (ai: OpenAI) => {
   })
 
   router.get('/speechToText', async (req, res) => {
-    const { text: trans } = await ai.audio.transcriptions.create({
-      file: fs.createReadStream(path.resolve(__dirname, './result/result.mp3')),
-      model: 'whisper-1',
-    })
-    res.send(trans)
-    setTimeout(() => {
-      res.send('Перевод')
-    }, 1000)
+    try {
+      const { text: trans } = await ai.audio.transcriptions.create({
+        file: fs.createReadStream(path.resolve(__dirname, './result/result.mp3')),
+        model: 'whisper-1',
+      })
+      if (isProd) {
+        res.send(trans)
+      } else {
+        setTimeout(() => {
+          res.send('Перевод')
+        }, 1000)
+      }
 
-    fs.writeFile(path.resolve(__dirname, './result/result.txt'), 'Перевод', (err) => {
-      if (err) throw err
-      console.log('File has been created and content has been written.')
-    })
+      fs.writeFile(path.resolve(__dirname, './result/result.txt'), 'Перевод', (err) => {
+        if (err) throw err
+        console.log('File has been created and content has been written.')
+      })
+    } catch (e) {
+      res.status(500).send('Пусто')
+    }
   })
 
   router.get('/brief', async (req, res) => {
     const trans = fs.readFileSync(path.resolve(__dirname, './result/result.txt'), 'utf-8')
-    const summary = await ai.chat.completions.create({
-      messages: [{ role: 'user', content: `Мне друг отправил сообщения, расскажи что он хотел мне сказать: ${trans}` }],
-      model: 'gpt-3.5-turbo',
-    })
-    res.send(summary.choices[0].message.content || '')
-    res.send('Пересказ')
+    if (!isProd) {
+      setTimeout(() => {
+        res.send('Пересказ')
+      }, 1000)
+    } else {
+      const summary = await ai.chat.completions.create({
+        messages: [{ role: 'user', content: `Мне друг отправил сообщения, расскажи что он хотел мне сказать: ${trans}` }],
+        model: 'gpt-3.5-turbo',
+      })
+      res.send(summary.choices[0].message.content || '')
+    }
   })
 
   router.get('/getSum', (req, res) => {
@@ -75,38 +87,42 @@ export const voiceApiWeb = (ai: OpenAI) => {
     fs.readdir(path.resolve(__dirname, './voices'), (err, files) => {
       if (err) {
         console.error('Error reading directory: ' + err.message)
-        res.status(500)
+        res.status(500).send(err.message)
         return
       }
 
-      // Фильтруем файлы, чтобы взять только аудиофайлы, например, mp3
-      const audioFiles = files
-        .filter((file) => path.extname(file).toLowerCase() === '.mp3') // фильтр по расширению .mp3
-        .map((file) => path.join(path.resolve(__dirname, './voices'), file)) // полный путь к каждому файлу
+      if (files.length) {
+        // Фильтруем файлы, чтобы взять только аудиофайлы, например, mp3
+        const audioFiles = files
+          .filter((file) => path.extname(file).toLowerCase() === '.mp3') // фильтр по расширению .mp3
+          .map((file) => path.join(path.resolve(__dirname, './voices'), file)) // полный путь к каждому файлу
 
-      if (audioFiles.length === 0) {
-        console.log('No audio files found in the directory.')
-        return
-      }
+        if (audioFiles.length === 0) {
+          console.log('No audio files found in the directory.')
+          return
+        }
 
-      const command = ffmpeg()
-      audioFiles.forEach((file) => {
-        command.input(file)
-      })
-
-      command
-        .on('error', (err) => {
-          console.error('Error: ' + err.message)
-          res.status(500).send(err.message)
+        const command = ffmpeg()
+        audioFiles.forEach((file) => {
+          command.input(file)
         })
-        .on('end', () => {
-          res.sendFile(path.resolve(__dirname, 'result/result.mp3'), (err) => {
-            if (err) {
-              console.error('не получилось целиком', err)
-            }
+
+        command
+          .on('error', (err) => {
+            console.error('Error: ' + err.message)
+            res.sendStatus(500).send(err.message)
           })
-        })
-        .mergeToFile(outputFile, './output')
+          .on('end', () => {
+            res.sendFile(path.resolve(__dirname, 'result/result.mp3'), (err) => {
+              if (err) {
+                console.error('не получилось целиком', err)
+              }
+            })
+          })
+          .mergeToFile(outputFile, './output')
+      } else {
+        res.status(500).send('no files')
+      }
     })
   })
 
