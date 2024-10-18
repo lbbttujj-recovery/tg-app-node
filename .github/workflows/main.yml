@@ -40,4 +40,5 @@ jobs:
             nvm --version
             npm ci
             nohup npm run tsnode &
+            exit
           EOF
