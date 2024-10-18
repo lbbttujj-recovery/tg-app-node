@@ -44,15 +44,15 @@ export const voiceApiWeb = (ai: OpenAI, isProd: boolean) => {
         file: fs.createReadStream(path.resolve(__dirname, './result/result.mp3')),
         model: 'whisper-1',
       })
-      if (isProd) {
-        res.send(trans)
-      } else {
-        setTimeout(() => {
-          res.send('Перевод')
-        }, 1000)
-      }
+      // if (isProd) {
+      res.send(trans)
+      // } else {
+      // setTimeout(() => {
+      //   res.send('Перевод')
+      // }, 1000)
+      // }
 
-      fs.writeFile(path.resolve(__dirname, './result/result.txt'), 'Перевод', (err) => {
+      fs.writeFile(path.resolve(__dirname, './result/result.txt'), trans, (err) => {
         if (err) throw err
         console.log('File has been created and content has been written.')
       })
@@ -63,17 +63,18 @@ export const voiceApiWeb = (ai: OpenAI, isProd: boolean) => {
 
   router.get('/brief', async (req, res) => {
     const trans = fs.readFileSync(path.resolve(__dirname, './result/result.txt'), 'utf-8')
-    if (!isProd) {
-      setTimeout(() => {
-        res.send('Пересказ')
-      }, 1000)
-    } else {
-      const summary = await ai.chat.completions.create({
-        messages: [{ role: 'user', content: `Мне друг отправил сообщения, расскажи что он хотел мне сказать: ${trans}` }],
-        model: 'gpt-3.5-turbo',
-      })
-      res.send(summary.choices[0].message.content || '')
-    }
+    // if (!isProd) {
+    //   setTimeout(() => {
+    //     res.send('Пересказ')
+    //   }, 1000)
+    // } else {
+    console.log(trans)
+    const summary = await ai.chat.completions.create({
+      messages: [{ role: 'user', content: `Мне друг отправил сообщения, расскажи что он хотел мне сказать: ${trans}` }],
+      model: 'gpt-3.5-turbo',
+    })
+    res.send(summary.choices[0].message.content || '')
+    // }
   })
 
   router.get('/getSum', (req, res) => {
