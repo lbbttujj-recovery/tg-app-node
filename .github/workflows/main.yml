@@ -25,6 +25,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no root@194.135.105.154 << 'EOF'
             cd tg-app-node/
             pkill node
+            npm run stop
             git fetch
             git pull origin main
             git checkout origin/main
@@ -38,7 +39,7 @@ jobs:
             node -v
             nvm --version
             npm ci
-            npm run tsnode
+            npm run start
             exit
           EOF
           exit 0
