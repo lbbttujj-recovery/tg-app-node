@@ -39,5 +39,5 @@ jobs:
             node -v
             nvm --version
             npm ci
-            npm run start
+            npm run pm2dev
           EOF
