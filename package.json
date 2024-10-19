@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "cross-env NODE_ENV=production pm2 start index.ts",
+    "start": "cross-env NODE_ENV=production pm2 start --name front 'HTTPS=true SSL_CRT_FILE=./certs/certificate.crt SSL_KEY_FILE=./certs/certificate.key npm' --start",
     "restart": "cross-env NODE_ENV=production pm2 restart index.ts",
     "stop": "pm2 stop index.ts",
     "tsnode": "cross-env NODE_ENV=production ts-node index.ts",
