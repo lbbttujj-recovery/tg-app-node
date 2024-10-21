@@ -23,7 +23,7 @@ const app = express()
 
 const IS_PROD = process.env.NODE_ENV === 'production'
 const IS_SELF_SSL = process.env.SSL === 'true'
-const PORT = IS_PROD ? process.env.PORT : process.env.LOCAL_PORT
+const PORT = IS_SELF_SSL ? process.env.PORT : process.env.LOCAL_PORT
 const FRONT_URL = process.env.FRONT_URL
 
 app.use(express.json())
