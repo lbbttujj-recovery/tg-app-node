@@ -26,6 +26,7 @@ jobs:
             cd tg-app-node/
             pkill node
             npm run stop
+            sudo systemctl restart nginx
             git fetch
             git pull origin main
             git checkout origin/main
@@ -36,8 +37,6 @@ jobs:
             [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
             nvm install node
             nvm install-latest-npm
-            node -v
-            nvm --version
             npm ci
             npm run pm2dev
           EOF
