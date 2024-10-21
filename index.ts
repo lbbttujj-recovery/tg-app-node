@@ -22,6 +22,7 @@ const bot = new TelegramBot(process.env.TELEGRAM_TOKEN || '', {
 const app = express()
 
 const IS_PROD = process.env.NODE_ENV === 'production'
+const IS_SELF_SSL = process.env.SSL === 'true'
 const PORT = IS_PROD ? process.env.PORT : process.env.LOCAL_PORT
 const FRONT_URL = process.env.FRONT_URL
 
@@ -73,7 +74,7 @@ app.get('/api/test', (req, res) => {
   res.send('hello')
 })
 
-if (!IS_PROD) {
+if (!IS_SELF_SSL) {
   app.listen(PORT, () => {
     console.log('backend running port ', PORT)
   })
@@ -85,5 +86,4 @@ if (!IS_PROD) {
   }
 
   https.createServer(httpsOptions, app).listen(PORT)
-  // 'lbbttujj.online'
 }
