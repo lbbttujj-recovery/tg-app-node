@@ -123,16 +123,21 @@ export const voiceApiTg = (bot: TelegramBot, ai: OpenAI) => {
 
   bot.onText(new RegExp('^brief$', 'ig'), async (ctx) => {
     const trans = fs.readFileSync(path.resolve(__dirname, './result/result.txt'), 'utf-8')
-    const summary = await ai.chat.completions.create({
-      messages: [
-        {
-          role: 'user',
-          content: `Мне друг отправил сообщения, расскажи что он хотел мне сказать: ${trans}`,
-        },
-      ],
-      model: 'gpt-3.5-turbo',
-    })
-    await bot.sendMessage(ctx.chat.id, summary.choices[0].message.content || '')
+    try {
+      const summary = await ai.chat.completions.create({
+        messages: [
+          {
+            role: 'user',
+            content: `Мне друг отправил сообщения, расскажи что он хотел мне сказать: ${trans}`,
+          },
+        ],
+        model: 'gpt-3.5-turbo',
+      })
+      await bot.sendMessage(ctx.chat.id, summary.choices[0].message.content || '')
+    } catch (error) {
+      console.error(error)
+      await bot.sendMessage(ctx.chat.id, 'error gpt')
+    }
   })
 }
 

@@ -48,8 +48,8 @@ const routesVoice = voiceApiWeb(ai, IS_PROD)
 const routesMood = moodApi(ai, IS_PROD)
 
 // Подключаем маршруты
-app.use('/voice', routesVoice)
-app.use('/mood', routesMood)
+app.use('/api/voice', routesVoice)
+app.use('/api/mood', routesMood)
 
 console.log('app running')
 
@@ -69,7 +69,7 @@ app.get('/api/data', (req, res) => {
   res.json({ message: 'CORS и HTTPS работают!' })
 })
 
-app.get('/test', (req, res) => {
+app.get('/api/test', (req, res) => {
   res.send('hello')
 })
 

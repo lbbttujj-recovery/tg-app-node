@@ -72,11 +72,21 @@ export const voiceApiWeb = (ai: OpenAI, isProd: boolean) => {
         res.send(mockText.short)
       }, 500)
     } else {
-      const summary = await ai.chat.completions.create({
-        messages: [{ role: 'user', content: `Мне друг отправил сообщения, расскажи что он хотел мне сказать: ${trans}` }],
-        model: 'gpt-3.5-turbo',
-      })
-      res.send(summary.choices[0].message.content || '')
+      try {
+        const summary = await ai.chat.completions.create({
+          messages: [
+            {
+              role: 'user',
+              content: `Мне друг отправил сообщения, расскажи что он хотел мне сказать: ${trans}`,
+            },
+          ],
+          model: 'gpt-3.5-turbo',
+        })
+        res.send(summary.choices[0].message.content || '')
+      } catch (error) {
+        console.error(error)
+        res.send('error gpt')
+      }
     }
   })
 
