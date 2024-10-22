@@ -40,6 +40,7 @@ bot.on('text', (ctx) => {
       inline_keyboard: [
         [{ text: 'Настроение', web_app: { url: `${FRONT_URL}/mood` } }],
         [{ text: 'Голосове', web_app: { url: `${FRONT_URL}/voice` } }],
+        [{ text: 'Тапалка', web_app: { url: `${FRONT_URL}/gipnofob` } }],
       ],
     },
   })
