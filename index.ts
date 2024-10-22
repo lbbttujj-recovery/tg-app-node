@@ -13,6 +13,7 @@ import { voiceApiTg } from './src/voiceApi/voiceApiTg'
 // const { voiceApiTg } = require('./src/voiceApi/voiceApiTg')
 import { voiceApiWeb } from './src/voiceApi/voiceApiWeb'
 import { moodApi } from './src/moodApi/moodApi'
+import { gipnofobApi } from './src/gipnofobApi/gipnofobApi'
 ffmpeg.setFfmpegPath(installer.path)
 
 const bot = new TelegramBot(process.env.TELEGRAM_TOKEN || '', {
@@ -47,10 +48,12 @@ bot.on('text', (ctx) => {
 voiceApiTg(bot, ai)
 const routesVoice = voiceApiWeb(ai, IS_PROD)
 const routesMood = moodApi(ai, IS_PROD)
+const routesGipnofob = gipnofobApi(IS_PROD)
 
 // Подключаем маршруты
 app.use('/api/voice', routesVoice)
 app.use('/api/mood', routesMood)
+app.use('/api/gipnofob', routesGipnofob)
 
 console.log('app running')
 

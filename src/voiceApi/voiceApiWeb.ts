@@ -58,7 +58,6 @@ export const voiceApiWeb = (ai: OpenAI, isProd: boolean) => {
 
       fs.writeFile(path.resolve(__dirname, './result/result.txt'), trans, (err) => {
         if (err) throw err
-        console.log('File has been created and content has been written.')
       })
     } catch (e) {
       res.status(500).send('Пусто')
