@@ -47,6 +47,8 @@ class Database {
     })
   }
 
+  //1tap -> 2 -> 3
+
   private createTable(): void {
     this.db.run(
       `CREATE TABLE IF NOT EXISTS users (
@@ -135,7 +137,7 @@ class Database {
   private _getScore(id: number): Promise<User[]> {
     return new Promise((resolve, reject) => {
       console.log(id)
-      this.db.all('SELECT score FROM users WHERE Id = ?', [id], (err, rows: User[]) => {
+      this.db.all('SELECT score, per_sec FROM users WHERE Id = ?', [id], (err, rows: User[]) => {
         if (err) {
           reject('Ошибка при получении данных: ' + err.message)
         } else {
@@ -148,8 +150,6 @@ class Database {
   public getScore(id: number): Promise<User[]> {
     return new Promise((resolve, reject) => {
       this.getUser(id).then((exist) => {
-        console.log('id', id)
-        console.log('exist', exist)
         if (exist) {
           this._getScore(id)
             .then((res) => {

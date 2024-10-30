@@ -9,9 +9,11 @@ export const gipnofobApi = (isProd: boolean) => {
     const { id } = req.query
     console.log(id)
     db.getScore(Number(id))
-      .then((score) => {
-        const currentScore = score[0].score
-        res.send(`${currentScore}`)
+      .then((user) => {
+        const score = user[0].score
+        const perSec = user[0].per_sec
+        const response = { score, perSec }
+        res.send(response)
       })
       .catch((e) => {
         console.log(e)
@@ -21,8 +23,6 @@ export const gipnofobApi = (isProd: boolean) => {
 
   router.post('/save', async (req, res) => {
     const { score, id } = req.body
-    console.log('score', score)
-    console.log(id)
     db.saveUserScore({ id, score })
       .then(() => {
         res.send('ok')
