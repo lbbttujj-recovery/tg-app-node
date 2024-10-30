@@ -47,9 +47,9 @@ const db = new Database()
 // // Закрытие базы данных, если нужно
 // db.close()
 
-db.getAllUsers().then((users) => {
-  console.log(users)
-})
+// db.getAllUsers().then((users) => {
+//   console.log(users)
+// })
 
 const ai = new OpenAI({
   apiKey: process.env.GPT_TOKEN || '',
