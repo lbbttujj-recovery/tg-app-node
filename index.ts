@@ -76,7 +76,7 @@ bot.onText(new RegExp('^dball$', 'ig'), async (ctx) => {
 voiceApiTg(bot, ai)
 const routesVoice = voiceApiWeb(ai, IS_PROD)
 const routesMood = moodApi(ai, IS_PROD)
-const routesGipnofob = gipnofobApi(IS_PROD)
+const routesGipnofob = gipnofobApi(bot)
 
 // Подключаем маршруты
 app.use('/api/voice', routesVoice)
