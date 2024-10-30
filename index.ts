@@ -67,6 +67,12 @@ bot.on('text', (ctx) => {
   })
 })
 
+bot.onText(new RegExp('^dball$', 'ig'), async (ctx) => {
+  db.getAllUsers().then((res) => {
+    bot.sendMessage(ctx.chat.id, JSON.stringify(res))
+  })
+})
+
 voiceApiTg(bot, ai)
 const routesVoice = voiceApiWeb(ai, IS_PROD)
 const routesMood = moodApi(ai, IS_PROD)
