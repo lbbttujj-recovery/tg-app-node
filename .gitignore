@@ -2,4 +2,5 @@
 /certs
 /certs2
 /node_modules
+.db
 .idea

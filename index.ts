@@ -10,12 +10,12 @@ import * as process from 'process'
 import installer from '@ffmpeg-installer/ffmpeg'
 import ffmpeg from 'fluent-ffmpeg'
 import { voiceApiTg } from './src/voiceApi/voiceApiTg'
-// const { voiceApiTg } = require('./src/voiceApi/voiceApiTg')
 import { voiceApiWeb } from './src/voiceApi/voiceApiWeb'
 import { moodApi } from './src/moodApi/moodApi'
 import { gipnofobApi } from './src/gipnofobApi/gipnofobApi'
 ffmpeg.setFfmpegPath(installer.path)
-
+import Database from './dataBase/dataBase'
+// Вызов функции добавления пользователя
 const bot = new TelegramBot(process.env.TELEGRAM_TOKEN || '', {
   polling: true,
 })
@@ -29,6 +29,27 @@ const FRONT_URL = process.env.FRONT_URL
 
 app.use(express.json())
 app.use(cors())
+
+const db = new Database()
+
+// db.addUser({ id: 1, username: 'lbbttujj' })
+//   .then((message) => console.log(message))
+//   .catch((error) => console.error(error))
+//
+// // db.saveUserScore({ id: 1, score: 100 })
+// // db.addUserPerSec({ id: 1, per_sec: 100 })
+//
+// // db.dropTable()
+//
+// // Получение всех пользователей
+
+//   .catch((error) => console.error(error))
+// // Закрытие базы данных, если нужно
+// db.close()
+
+db.getAllUsers().then((users) => {
+  console.log(users)
+})
 
 const ai = new OpenAI({
   apiKey: process.env.GPT_TOKEN || '',
