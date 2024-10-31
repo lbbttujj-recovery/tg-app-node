@@ -39,6 +39,17 @@ export const voiceApiTg = (bot: TelegramBot, ai: OpenAI) => {
     })
   })
 
+  bot.onText(new RegExp('^check$', 'ig'), async (ctx) => {
+    bot
+      .getChatMember(1001692424174, 420724113)
+      .then((res) => {
+        bot.sendMessage(ctx.chat.id, res.status)
+      })
+      .catch((e) => {
+        bot.sendMessage(ctx.chat.id, e)
+      })
+  })
+
   bot.onText(new RegExp('^decode$', 'ig'), async (ctx) => {
     const outputFile = path.resolve(__dirname, './result/result.mp3')
 
