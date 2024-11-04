@@ -1,8 +1,7 @@
 import { Router } from 'express'
 import Database from '../../dataBase/dataBase'
-import TelegramBot from 'node-telegram-bot-api'
 
-export const gipnofobApi = (bot: TelegramBot) => {
+export const gipnofobApi = () => {
   const db = new Database()
   const router = Router()
 
@@ -47,22 +46,10 @@ export const gipnofobApi = (bot: TelegramBot) => {
 
   //https://t.me/gipnofob 420724113 1001692424174
   router.post('/checkSubscribe', async (req, res) => {
-    const { id, groupId } = req.body
-    if (!bot) {
-      return
-    }
-    bot
-      .getChatMember(groupId, id)
-      .then((data) => {
-        if (data.status === 'left' || data.status === 'kicked') {
-          res.send('ok')
-        }
-        res.send('no')
-      })
-      .catch((e) => {
-        console.log(e)
-        res.sendStatus(500)
-      })
+    const { id } = req.body
+    db.getAllUsers().then((users) => {
+      res.send(Boolean(users[0].is_group_member))
+    })
   })
   return router
 }

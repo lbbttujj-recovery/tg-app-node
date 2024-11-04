@@ -55,6 +55,24 @@ const ai = new OpenAI({
   apiKey: process.env.GPT_TOKEN || '',
 })
 
+bot.on('message', (msg) => {
+  // Проверка на событие вступления в канал
+  if (msg.new_chat_members) {
+    msg.new_chat_members.forEach((newMember) => {
+      db.editGroupMember({ isAdd: true, id: newMember.id }).catch((e) => {
+        console.log('error')
+        console.log(e)
+      })
+    })
+  }
+  if (msg.left_chat_member) {
+    db.editGroupMember({ isAdd: false, id: msg.left_chat_member.id }).catch((e) => {
+      console.log('error')
+      console.log(e)
+    })
+  }
+})
+
 bot.on('text', (ctx) => {
   bot.sendMessage(ctx.chat.id, 'Приложение', {
     reply_markup: {
@@ -67,6 +85,10 @@ bot.on('text', (ctx) => {
   })
 })
 
+db.getAllUsers().then((res) => {
+  console.log(res)
+})
+
 bot.onText(new RegExp('^dball$', 'ig'), async (ctx) => {
   db.getAllUsers().then((res) => {
     bot.sendMessage(ctx.chat.id, JSON.stringify(res))
@@ -76,7 +98,7 @@ bot.onText(new RegExp('^dball$', 'ig'), async (ctx) => {
 voiceApiTg(bot, ai)
 const routesVoice = voiceApiWeb(ai, IS_PROD)
 const routesMood = moodApi(ai, IS_PROD)
-const routesGipnofob = gipnofobApi(bot)
+const routesGipnofob = gipnofobApi()
 
 // Подключаем маршруты
 app.use('/api/voice', routesVoice)

@@ -1,7 +1,5 @@
 import sqlite3 from 'sqlite3'
 import path from 'node:path'
-import { FineTuningJob } from 'openai/resources/fine-tuning'
-import Error = FineTuningJob.Error
 
 interface User {
   id: number
@@ -9,6 +7,7 @@ interface User {
   created_at: number
   cards: string
   per_sec: number
+  is_group_member: 0 | 1
 }
 
 type AddUser = Pick<User, 'id'>
@@ -19,6 +18,18 @@ type AddPerSec = Pick<User, 'id' | 'per_sec'>
 
 const usersTablePath = path.resolve(__dirname, './users.db')
 console.log(usersTablePath)
+
+const CREATE_TABLE = `
+    CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT,
+            score INTEGER,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            cards TEXT,
+            per_sec INTEGER,
+            is_group_member INTEGER DEFAULT 0
+        )
+    `
 
 class Database {
   private db: sqlite3.Database
@@ -50,23 +61,13 @@ class Database {
   //1tap -> 2 -> 3
 
   private createTable(): void {
-    this.db.run(
-      `CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT,
-            score INTEGER,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-            cards TEXT,
-            per_sec INTEGER
-        )`,
-      (err) => {
-        if (err) {
-          console.error('Ошибка при создании таблицы:', err.message)
-        } else {
-          console.log('Таблица users готова к использованию.')
-        }
-      },
-    )
+    this.db.run(CREATE_TABLE, (err) => {
+      if (err) {
+        console.error('Ошибка при создании таблицы:', err.message)
+      } else {
+        console.log('Таблица users готова к использованию.')
+      }
+    })
   }
 
   public addUser(user: AddUser): Promise<string> {
@@ -180,6 +181,20 @@ class Database {
       } else {
         console.log('Соединение с базой данных закрыто.')
       }
+    })
+  }
+  public editGroupMember({ isAdd, id }: { isAdd: boolean; id: number }): Promise<string> {
+    return new Promise((resolve, reject) => {
+      console.log(isAdd, id)
+      const stmt = this.db.prepare('UPDATE users SET is_group_member = ? WHERE id = ?')
+      stmt.run(Number(isAdd), id, (err: Error) => {
+        if (err) {
+          console.log('here____')
+          reject('Ошибка добавления данных: ' + err.message)
+        } else {
+          resolve('Пользователь добавлен.')
+        }
+      })
     })
   }
 }
